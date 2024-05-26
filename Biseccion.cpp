@@ -1,37 +1,56 @@
 #include <iostream>
 #include <iomanip>
-#include <cmath>
+#include "muparser/muParser.h" 
 
 using namespace std;
+using namespace mu;
 
-double Funcion, a, b;
+double a, b;
 
-void Tabular(double Funcion);
+void Tabular(Parser &parser);
 
-int main ()
+int main()
 {
-    cout << "Calculo aproximado de una raiz de una funcion por medio de método de bisección" << endl;
-    cout << "Ingrese una función: ";
-    cin >> Funcion; 
+    cout << "Calculo aproximado de una raiz de una funcion por medio de metodo de biseccion" << endl;
+
+    string funcion;
+    cout << "Ingrese una funcion (por ejemplo: x^2 - 4): ";
+    cin >> funcion;
 
     cout << "Ingrese el intervalo inicial [a,b]" << endl;
-    
+
     cout << "a = ";
     cin >> a;
 
     cout << "b = ";
     cin >> b;
 
-    Tabular(Funcion);
+    Parser parser;
+    try {
+        parser.SetExpr(funcion);
+    }
+    catch (Parser::exception_type &e) {
+        cerr << "Error: " << e.GetMsg() << endl;
+        return 1;
+    }
 
+    Tabular(parser);
+
+    return 0;
 }
 
-void Tabular (double Funcion)
+void Tabular(Parser &parser)
 {
-    int i;
     cout << "x         f(x)" << endl;
-    for (i = 3; i = -3; i--)
+    for (double x = 3; x >= -3; x--)
     {
-        cout << i << Funcion(i) << endl;
+        parser.DefineVar("x", &x);
+        try {
+            cout << x << "    " << parser.Eval() << endl;
+        }
+        catch (Parser::exception_type &e) {
+            cerr << "Error: " << e.GetMsg() << endl;
+            break;
+        }
     }
 }
